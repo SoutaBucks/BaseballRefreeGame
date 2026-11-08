@@ -14,6 +14,9 @@ public final class ThrowOutResolver {
   private static final double DOUBLE_MAX_THROW_OUT_CHANCE = 0.30;
   private static final double TRIPLE_MAX_THROW_OUT_CHANCE = 0.40;
 
+  // 가장 빠른 타자가 가장 느린 타자 확률의 몇 배로 잡히는지(0.15 = 15%), 아무리 빨리도 잡힌다
+  private static final double FASTEST_RUNNER_CHANCE_SHARE = 0.15;
+
   private ThrowOutResolver() {}
 
   //반환값: 타자가 잡힌 베이스(1~3), 잡히지 않았으면 NOT_THROWN_OUT
@@ -23,7 +26,7 @@ public final class ThrowOutResolver {
       return NOT_THROWN_OUT;
     }
 
-    double throwOutChance = maxThrowOutChanceFor(outcome) * slownessOf(homeToFirstSec);
+    double throwOutChance = maxThrowOutChanceFor(outcome) * throwOutChanceShareOf(homeToFirstSec);
     boolean thrownOut = random.nextDouble() < throwOutChance;
     return thrownOut ? targetBase : NOT_THROWN_OUT;
   }
@@ -42,6 +45,12 @@ public final class ThrowOutResolver {
       case TRIPLE -> 3;
       default -> NOT_THROWN_OUT;
     };
+  }
+
+  // 최대 확률 중 실제로 적용할 비율: FASTEST_RUNNER_CHANCE_SHARE 0.0~1.0
+  private static double throwOutChanceShareOf(double homeToFirstSec) {
+    double shareRange = 1.0 - FASTEST_RUNNER_CHANCE_SHARE;
+    return FASTEST_RUNNER_CHANCE_SHARE + shareRange * slownessOf(homeToFirstSec);
   }
 
   private static double maxThrowOutChanceFor(HitOutcome outcome) {
