@@ -24,7 +24,7 @@ bin/
 *.ipr
 out/
 !**/src/main/**/out/
-!**/src/test/**/out/
+**/src/test/
 
 ### NetBeans ###
 /nbproject/private/
