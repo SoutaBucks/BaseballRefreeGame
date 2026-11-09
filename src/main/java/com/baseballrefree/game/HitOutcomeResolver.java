@@ -17,5 +17,19 @@ public class HitOutcomeResolver {
 
   public static HitOutcome resolve(double battingAverage, Random random) {
     double roll = random.nextDouble();
+    if (roll < battingAverage) {
+      double hitRoll = random.nextDouble();
+      if (hitRoll < SINGLE_SHARE)
+        return HitOutcome.SINGLE;
+      else if (hitRoll < SINGLE_SHARE + DOUBLE_SHARE)
+        return HitOutcome.DOUBLE;
+      else if (hitRoll < SINGLE_SHARE + DOUBLE_SHARE + TRIPLE_SHARE)
+        return HitOutcome.TRIPLE;
+      return HitOutcome.HOMERUN;
+    }
+    double nonHitRoll = random.nextDouble();
+    if (nonHitRoll < FOUL_SHARE_OF_NON_HIT)
+      return HitOutcome.FOUL;
+    return (random.nextDouble() < GROUND_OUT_SHARE_OF_OUT ? HitOutcome.GROUND_OUT : HitOutcome.OUT);
   }
 }
