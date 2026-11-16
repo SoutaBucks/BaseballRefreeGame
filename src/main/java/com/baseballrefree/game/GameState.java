@@ -32,7 +32,7 @@ public class GameState {
     homeScore += runs;
     homeInningRuns[inning - 1] += runs;
   }
-  public int[] getHomeInningRuns() { return awayInningRuns.clone(); }
+  public int[] getHomeInningRuns() { return homeInningRuns.clone(); }
 
   public void addAwayScore(int runs) {
     awayScore += runs;
