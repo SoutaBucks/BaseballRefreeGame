@@ -31,11 +31,11 @@ public final class GroundBallResolver {
 
   // 1루부터 연속으로 찬 주자들은 모두 밀려나므로, 그중 가장 앞 주자가 향하는 베이스가 선행 포스 베이스다.
   static int leadForcedBase(Bases bases) {
-    if (!bases.first())
+    if (!bases.isFirst())
       return NO_FORCE;
-    else if(!bases.second())
+    else if(!bases.isSecond())
       return 2;
-    else if(!bases.third())
+    else if(!bases.isThird())
       return 3;
     return HOME_PLATE;
   }
