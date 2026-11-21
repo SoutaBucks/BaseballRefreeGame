@@ -1,17 +1,14 @@
 package com.baseballrefree.game;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public final class Bases {
   private boolean first;
   private boolean second;
   private boolean third;
-
-  public boolean first() { return first; }
-  public boolean second() { return second; }
-  public boolean third() { return third; }
-
-  public void setFirst(boolean v) { first = v; }
-  public void setSecond(boolean v) { second = v; }
-  public void setThird(boolean v) { third = v; }
 
   public void clear() {
     first = false;
