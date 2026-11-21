@@ -1,4 +1,10 @@
 package com.baseballrefree.player;
 
-public record Pitcher(String name) {
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public final class Pitcher {
+  private final String name;
 }
