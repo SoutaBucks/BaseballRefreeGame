@@ -5,5 +5,15 @@ package com.baseballrefree.player;
 *  battingAverage -> 타율
 *  homeToFirstSec -> 타자 주력 속도...?
 */
-public record Batter(String name, double heightCm, double battingAverage, double homeToFirstSec) {
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public final class Batter {
+  private final String name;
+  private final double heightCm;
+  private final double battingAverage;
+  private final double homeToFirstSec;
 }
