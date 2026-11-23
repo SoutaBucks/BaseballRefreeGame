@@ -2,6 +2,7 @@ package com.baseballrefree.pitch;
 
 import com.baseballrefree.judgment.Judgment;
 import com.baseballrefree.strikezone.StrikeZone;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,8 @@ import java.util.Random;
  * INTEGRATION_STEP_SEC -> 운동 방정식 수치 적분의 시간 간격
  * AIM_ITERATIONS -> 도착점을 맞추기 위해 초기 속도를 보정하며 다시 던져 보는 횟수
  */
-public final class PitchSimulator {
+@Component
+public class PitchSimulator {
   private static final double MOUND_TO_PLATE_CM = 1844.0;
   private static final double RELEASE_HEIGHT_CM = 180.0;
   private static final double TIME_STEP_SEC = 0.02;
@@ -54,9 +56,7 @@ public final class PitchSimulator {
   private static final double INTEGRATION_STEP_SEC = 0.0005;
   private static final int AIM_ITERATIONS = 8;
 
-  private PitchSimulator() {}
-
-  public static Pitch simulate(StrikeZone zone, Random random) {
+  public Pitch simulate(StrikeZone zone, Random random) {
     PitchType type = randomPitchType(random);
     double speedKmh = randomSpeedKmh(type, random);
     double releaseSpeedCmPerSec = kmhToCmPerSec(speedKmh);
@@ -79,7 +79,7 @@ public final class PitchSimulator {
 
   // 타자가 체크스윙을 하는 경우 절반은 노스윙, 절반은 스윙으로 한다
   // 두 구간 사이를 비워 두어 육안으로 구분 가능하게 한다
-  private static double randomCheckSwingExtent(Random random) {
+  private double randomCheckSwingExtent(Random random) {
     if (random.nextDouble() >= CHECK_SWING_PROBABILITY) {
       return NO_SWING;
     }
@@ -89,12 +89,12 @@ public final class PitchSimulator {
         : randomInRange(random, HELD_BACK_EXTENT_MIN, HELD_BACK_EXTENT_MAX);
   }
 
-  private static PitchType randomPitchType(Random random) {
+  private PitchType randomPitchType(Random random) {
     PitchType[] types = PitchType.values(); // ENUM의 value들을 배열로 반환
     return types[random.nextInt(types.length)]; // 구종 중에서 랜덤으로 선택
   }
 
-  private static double randomSpeedKmh(PitchType type, Random random) {
+  private double randomSpeedKmh(PitchType type, Random random) {
     return randomInRange(random, type.minSpeedKmh, type.maxSpeedKmh);
   }
 
@@ -114,26 +114,27 @@ public final class PitchSimulator {
 
   // 공기저항만 받는 직선 비행의 도달 시간(초). dv/dt = -k·v² 를 풀면 이동거리 d = ln(1 + k·v0·t) / k 이므로
   // t = (e^(k·d) - 1) / (k·v0). 회전 가속도를 정하기 위한 추정치로만 쓴다(실제 궤적은 수치 적분).
-  private static double flightTimeWithDragSec(double releaseSpeedCmPerSec) {
+  private double flightTimeWithDragSec(double releaseSpeedCmPerSec) {
     double kd = DRAG_CONSTANT_PER_CM * MOUND_TO_PLATE_CM;
     return (Math.exp(kd) - 1) / (DRAG_CONSTANT_PER_CM * releaseSpeedCmPerSec);
   }
 
   // 구종 무브먼트(cm)를 회전(마그누스 힘)에 의한 일정 가속도(cm/s²)로 환산한다.
   // Statcast 무브먼트는 등가속도 모델의 변위 ½·a·T² 로 정의되므로 a = 2·M / T².
-  private static double movementToAccelCmPerSec2(double movementCm, double flightTimeSec) {
+  private double movementToAccelCmPerSec2(double movementCm, double flightTimeSec) {
     return 2 * movementCm / (flightTimeSec * flightTimeSec);
   }
 
   // 릴리스 속력을 유지하면서 좌우, 상하 성분을 뺀 나머지 전진(홈플레이트 방향) 속력(cm/s)
-  private static double forwardSpeedCmPerSec(double releaseSpeedCmPerSec, double vx, double vy) {
+  private double forwardSpeedCmPerSec(double releaseSpeedCmPerSec, double vx, double vy) {
     return Math.sqrt(releaseSpeedCmPerSec * releaseSpeedCmPerSec - vx * vx - vy * vy);
   }
 
   // 목표 도착점(plateX, plateY)에 들어가는 궤적을 만든다(슈팅법).
   // 초기 속도를 추정해 던져 보고, 빗나간 거리 / 비행시간 만큼 초기 속도를 보정해 다시 던지기를 반복한다.
   // releaseSpeedCmPerSec: 릴리스 속력(전광판 구속), releaseX: 릴리스 좌우 위치.
-  private static List<PitchPoint> buildTrajectory(PitchType type, double releaseSpeedCmPerSec, double releaseX, double plateX, double plateY) {
+  private List<PitchPoint> buildTrajectory(PitchType type, double releaseSpeedCmPerSec,
+                                           double releaseX, double plateX, double plateY) {
     double estimatedFlightSec = flightTimeWithDragSec(releaseSpeedCmPerSec);
     double spinAccelX = movementToAccelCmPerSec2(type.horizontalBreakCm, estimatedFlightSec);
     double spinAccelY = movementToAccelCmPerSec2(-type.extraDropCm, estimatedFlightSec);
@@ -157,7 +158,7 @@ public final class PitchSimulator {
   // 주어진 초기 속도로 공을 던져 홈플레이트 평면(z=0)을 지날 때까지 운동방정식을 적분한다.
   // 가속도 = 중력 + 회전 가속도(spinAccelX/Y, 상수) + 공기저항(-k·|v|·v). 반암시적 오일러 적분.
   // 반환: TIME_STEP_SEC 간격의 궤적 포인트, 마지막 포인트는 z=0 통과 지점.
-  private static List<PitchPoint> flyBall(double releaseX, double vx, double vy, double vz,
+  private List<PitchPoint> flyBall(double releaseX, double vx, double vy, double vz,
                                           double spinAccelX, double spinAccelY) {
     List<PitchPoint> points = new ArrayList<>();
     double x = releaseX;

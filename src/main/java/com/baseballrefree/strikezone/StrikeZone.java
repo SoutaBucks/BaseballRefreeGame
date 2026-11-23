@@ -1,16 +1,6 @@
 package com.baseballrefree.strikezone;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
-public final class StrikeZone {
-  private final double leftX;
-  private final double rightX;
-  private final double bottomY;
-  private final double topY;
-
+public record StrikeZone(double leftX, double rightX, double bottomY, double topY) {
   // 스트라이크 존에 공이 포함이 되었냐?
   public boolean contains(double x, double y) {
     return x >= leftX && x <= rightX && y >= bottomY && y <= topY;
