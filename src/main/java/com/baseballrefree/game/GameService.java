@@ -28,11 +28,11 @@ public class GameService {
   private final StrikeZoneCalculator strikeZoneCalculator;
   private final PlayerGenerator playerGenerator;
   private final HitOutcomeResolver hitOutcomeResolver;
+  private final ThrowOutResolver throwOutResolver;
   private final GroundBallResolver groundBallResolver;
   private final BaseAdvancer baseAdvancer;
   private final JudgmentProcessor judgmentProcessor;
   private final InningManager inningManager;
-  private final ThrowOutResolver throwOutResolver;
 
   // 진행 중인 게임 상태. startGame() 전에는 null
   private GameState state;
