@@ -34,4 +34,14 @@ public final class Bases {
       default -> throw new IllegalArgumentException("Unexpected base: " + base);
     }
   }
+
+  // 타자가 1루로 가면서 다른 주자가 한 베이스씩 진루한다. 반환값 -> 득점 수
+  public int forceAdvance() {
+    boolean basesLoaded = first && second && third;
+    int runs = basesLoaded ? 1 : 0;
+    boolean pushedToThird = first && second;
+    boolean secondOccupied = second || first;
+    setRunners(true, secondOccupied, third || pushedToThird);
+    return runs;
+  }
 }

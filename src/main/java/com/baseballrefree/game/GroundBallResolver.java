@@ -25,7 +25,7 @@ public class GroundBallResolver {
   private final ThrowOutResolver throwOutResolver;
 
   // 반환값 : 아웃을 잡은 베이스들 (송구 순서), 4는 홈, 선행 주자만 잡고 1루가 빠졌으면 병살 실패
-  public static List<Integer> resolve(Bases bases, int outs, double batterHomeToFirstSec, Random random) {
+  public List<Integer> resolve(Bases bases, int outs, double batterHomeToFirstSec, Random random) {
     int leadForceBase = leadForcedBase(bases);
     boolean takeSureOutAtFirst = leadForceBase == NO_FORCE || outs >= OUTS_BEFORE_INNING_ENDS;
     if (takeSureOutAtFirst)
@@ -47,7 +47,7 @@ public class GroundBallResolver {
   }
 
   private double doublePlayChanceFor(double batterHomeToFirstSec) {
-    double slowness = ThrowOutResolver.slownessOf(batterHomeToFirstSec);
+    double slowness = throwOutResolver.slownessOf(batterHomeToFirstSec);
     double changeRange = SLOWEST_BATTER_DOUBLE_PLAY_CHANCE - FASTEST_BATTER_DOUBLE_PLAY_CHANCE;
     return FASTEST_BATTER_DOUBLE_PLAY_CHANCE + changeRange * slowness;
   }
