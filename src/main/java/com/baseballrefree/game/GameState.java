@@ -9,14 +9,14 @@ import lombok.Setter;
 public class GameState {
   private static final int TOTAL_INNINGS = 9;
 
-  // 외부에서 직접 바꿔도 되는 값만 @Setter (boolean getter는 isXXX)
-  @Setter private int inning = 1;
-  @Setter private boolean topOfInning = true;
+  // 불변식이 없는 단순 교체 값만 @Setter
   @Setter private Batter currentBatter;
   @Setter private Pitcher currentPitcher;
-  @Setter private boolean gameOver = false;
 
   // 규칙이 있는 값: 변경은 addXXX()/useVar() 등으로만 가능 (setter X)
+  private int inning = 1;
+  private boolean topOfInning = true;
+  private boolean gameOver = false;
   private int homeScore = 0;
   private int awayScore = 0;
   private int outs = 0;
@@ -42,6 +42,12 @@ public class GameState {
 
   public void addOut() { outs++; }
   public void resetOuts() { outs = 0; }
+  public void startNextInning() {
+    inning++;
+    topOfInning = true;
+  }
+  public void startBottomOfInning() { topOfInning = false; }
+  public void endGame() { gameOver = true; }
   public void useVar() {
     if (varRemaining > 0)
       varRemaining--;

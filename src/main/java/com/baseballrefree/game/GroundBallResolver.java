@@ -1,5 +1,8 @@
 package com.baseballrefree.game;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.Random;
 
@@ -8,7 +11,9 @@ import java.util.Random;
 *  0, 1아웃 포스 상황이면 선행 주자를 먼저 잡고 1루로 병살 시도를 한다
 *  병살 성공률은 타자가 느릴 수록 좋다
 * */
-public final class GroundBallResolver {
+@Component
+@RequiredArgsConstructor
+public class GroundBallResolver {
   public static final int NO_FORCE = 0;
   public static final int HOME_PLATE = 4;
   private static final int FIRST_BASE = 1;
@@ -16,7 +21,8 @@ public final class GroundBallResolver {
   private static final double FASTEST_BATTER_DOUBLE_PLAY_CHANCE = 0.25;
   private static final double SLOWEST_BATTER_DOUBLE_PLAY_CHANCE = 0.85;
 
-  private GroundBallResolver() {}
+  // 타자 주력을 0~1 느림 정도로 바꿔 주는 협력 컴포넌트
+  private final ThrowOutResolver throwOutResolver;
 
   // 반환값 : 아웃을 잡은 베이스들 (송구 순서), 4는 홈, 선행 주자만 잡고 1루가 빠졌으면 병살 실패
   public static List<Integer> resolve(Bases bases, int outs, double batterHomeToFirstSec, Random random) {
@@ -30,7 +36,7 @@ public final class GroundBallResolver {
   }
 
   // 1루부터 연속으로 찬 주자들은 모두 밀려나므로, 그중 가장 앞 주자가 향하는 베이스가 선행 포스 베이스다.
-  static int leadForcedBase(Bases bases) {
+  int leadForcedBase(Bases bases) {
     if (!bases.isFirst())
       return NO_FORCE;
     else if(!bases.isSecond())
@@ -40,7 +46,7 @@ public final class GroundBallResolver {
     return HOME_PLATE;
   }
 
-  private static double doublePlayChanceFor(double batterHomeToFirstSec) {
+  private double doublePlayChanceFor(double batterHomeToFirstSec) {
     double slowness = ThrowOutResolver.slownessOf(batterHomeToFirstSec);
     double changeRange = SLOWEST_BATTER_DOUBLE_PLAY_CHANCE - FASTEST_BATTER_DOUBLE_PLAY_CHANCE;
     return FASTEST_BATTER_DOUBLE_PLAY_CHANCE + changeRange * slowness;

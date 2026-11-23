@@ -6,19 +6,18 @@ public final class InningManager {
 
   private InningManager() {}
 
+  // state -> 아웃카운트가 갱신된 경기 상태. 3아웃이면 아무것도 하지 않음
   public static void afterOutsUpdated(GameState state) {
     if (state.getOuts() < OUTS_PER_HALF_INNING) return;
     state.resetOuts();
     state.getBases().clear();
     state.getCount().reset();
 
-    if (!state.isTopOfInning()) {
-      if (state.getInning() >= TOTAL_INNINGS) {
-        state.setGameOver(true);
-        return;
-      }
-      state.setInning(state.getInning() + 1);
-      state.setTopOfInning(true);
-    } else state.setTopOfInning(false);
+    if (!state.isTopOfInning())
+      state.startBottomOfInning();
+    else if (state.getInning() >= TOTAL_INNINGS)
+      state.endGame();
+    else
+      state.startNextInning();
   }
 }
