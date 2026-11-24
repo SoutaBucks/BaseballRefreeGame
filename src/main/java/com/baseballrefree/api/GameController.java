@@ -1,5 +1,6 @@
 package com.baseballrefree.api;
 
+import com.baseballrefree.game.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,4 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class GameController {
+
+  private final GameService gameService;
 }
